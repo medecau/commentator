@@ -75,6 +75,7 @@ def do_doc(o, header=0):
 def extract_docs(module):
     
     # DOCUMENT THE MODULE
+    # 
     docs=dict()
     docs['name'] = module.__name__
     docs['doc'] = module.__doc__
