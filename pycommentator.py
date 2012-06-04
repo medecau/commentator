@@ -20,7 +20,7 @@ def doc(obj):
         current['doc']=None
     
     if isfunction(obj) or ismethod(obj):
-        pass
+        current['args']=getargspec(obj)
     
     if isclass(obj):
         methods=getmembers(obj, ismethod)

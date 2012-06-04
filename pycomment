@@ -7,6 +7,20 @@ def printdoc(obj):
     if obj['doc']:
         print obj['doc']
 
+def docargs(obj):
+    args=[]
+    if obj['args'][0]:
+        if obj['args'][3]:
+            args+=obj['args'][0][:-1*len(obj['args'][3])]
+            args+=['%s=%s' % x for x in zip(obj['args'][0], obj['args'][3])]
+        else:
+            args=obj['args'][0]
+    if obj['args'][1]:
+        args.append('*%s' % obj['args'][1])
+    if obj['args'][2]:
+        args.append('**%s' % obj['args'][2])
+    return ', '.join(args)
+
 def printmarkdown(docs):
     
     ### THE HEADER
@@ -19,6 +33,7 @@ def printmarkdown(docs):
         for function in docs['functions']:
             print '## %s' % function['name']
             printdoc(function)
+            print docargs(function)
     # Module classes
     if docs['classes']:
         print '# Classes'
