@@ -31,16 +31,20 @@ def printmarkdown(docs):
     if docs['functions']:
         print '# Functions'
         for function in docs['functions']:
-            print '## %s' % function['name']
+            print '## %s(%s)' % (function['name'], docargs(function))
             printdoc(function)
-            print docargs(function)
     # Module classes
     if docs['classes']:
         print '# Classes'
         for classie in docs['classes']:
             print '## %s' % classie['name']
             printdoc(classie)
-    
+            for method in classie['methods']:
+                if method['name'] == '__init__':
+                    print '# %s(%s)' % (classie['name'], docargs(method))
+                else:
+                    print '# %s(%s)' % (method['name'], docargs(method))
+            
 
 
 def main(argv):
