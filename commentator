@@ -1,0 +1,35 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from inspect import *
+from pkgutil import *
+import clint
+from os import path
+
+def walkpkgs(p=None):
+    if not p:
+        p='.'
+    p=path.abspath(p)
+    p_init = '%s/__init__.py' % p
+
+    prefix=''
+    if path.exists(p_init) and path.isfile(p_init):
+        root_importer = get_importer(p)
+        prefix='%s.' % path.basename(p)
+        yield (root_importer, path.basename(p), True)
+    
+    for pkg in walk_packages([p], prefix):
+        yield pkg
+
+def doc(name):
+    obj = __import__(name)
+    return obj.__name__
+
+def main(argv):
+    for arg in clint.args.all:
+        print 'arg: %s' % arg
+        for pkg in walkpkgs(arg):
+            print pkg
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)

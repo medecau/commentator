@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 #import webbrowser
 from inspect import *
+from imp import *
+from os import *
 
 def doc(obj):
     '''document obj
@@ -10,7 +12,8 @@ def doc(obj):
     
     if obj.__name__:
         current['name']=obj.__name__
-    elif obj.__file__:
+    
+    if obj.__file__:
         current['file']=obj.__file__
         
     
@@ -19,6 +22,10 @@ def doc(obj):
     else:
         current['doc']=None
     
+    if ismodule(obj) and current['file']:
+        print str(getmembers(obj)).find('crypto')
+        current['modules']=os.listdir(os.path.dirname(current['file']))
+
     if isfunction(obj) or ismethod(obj):
         current['args']=getargspec(obj)
     
