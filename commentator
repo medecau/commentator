@@ -4,22 +4,35 @@ from inspect import *
 from pkgutil import *
 import clint
 from os import path
+import os
 
 def walkpkgs(p=None):
+    '''
+        walk the packages
+    '''
+    initial_dir=os.getcwd()
+    pkgs=list()
     if not p:
         p='.'
-    p=path.abspath(p)
+    pabs=path.abspath(p)
     p_init = '%s/__init__.py' % p
-
     prefix=''
-    if path.exists(p_init) and path.isfile(p_init):
-        root_importer = get_importer(p)
-        prefix='%s.' % path.basename(p)
-        yield (root_importer, path.basename(p), True)
+    base=path.basename(pabs)
     
-    for pkg in walk_packages([p], prefix):
+    if path.exists(p_init) and path.isfile(p_init):
+        os.chdir(path.dirname(pabs))
+        root_importer = get_importer(base)
+        prefix='%s.' % base
+        pkgs.append((root_importer, path.basename(p), True))
+    else:
+        os.chdir(pabs)
+    
+    for pkg in walk_packages([base], prefix):
+        pkgs.append(pkg)
+    
+    os.chdir(initial_dir)
+    for pkg in pkgs:
         yield pkg
-
 
 def doc(name):
     obj = __import__(name)
@@ -27,7 +40,6 @@ def doc(name):
 
 def main(argv):
     for arg in clint.args.all:
-        print 'arg: %s' % arg
         for pkg in walkpkgs(arg):
             print pkg
 
