@@ -1,47 +1,67 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from inspect import *
-from pkgutil import *
+import inspect
 import clint
-from os import path
-import os
 
-def walkpkgs(p=None):
-    '''
-        walk the packages
-    '''
-    initial_dir=os.getcwd()
-    pkgs=list()
-    if not p:
-        p='.'
-    pabs=path.abspath(p)
-    p_init = '%s/__init__.py' % p
-    prefix=''
-    base=path.basename(pabs)
+class Commentator(object):
+    def __init__(self, obj):
+        self.obj = obj
     
-    if path.exists(p_init) and path.isfile(p_init):
-        os.chdir(path.dirname(pabs))
-        root_importer = get_importer(base)
-        prefix='%s.' % base
-        pkgs.append((root_importer, path.basename(p), True))
-    else:
-        os.chdir(pabs)
+    def __repr__(self):
+        return self.obj.__name__
     
-    for pkg in walk_packages([base], prefix):
-        pkgs.append(pkg)
+    @property
+    def name(self):
+        return self.obj.__name__
     
-    os.chdir(initial_dir)
-    for pkg in pkgs:
-        yield pkg
+    @property
+    def doc(self):
+        return inspect.getdoc(self.obj)
+    
+    @property
+    def members(self):
+        for member in inspect.getmembers(self.obj):
+            c = Commentator(member[1])
+            if c.ismodule or c.isclass or c.ismethod or c.isfunction:
+                yield c
+    
+    @property    
+    def ismodule(self):
+        return inspect.ismodule(self.obj)
+    
+    @property
+    def isclass(self):
+        return inspect.isclass(self.obj)
+    
+    @property
+    def ismethod(self):
+        return inspect.ismethod(self.obj)
+    
+    @property
+    def isfunction(self):
+        return inspect.isfunction(self.obj)
 
 def doc(name):
-    obj = __import__(name)
-    return obj.__name__
+    try:
+        obj = __import__(name)
+        if ismodule(obj):
+            return Commentator(obj)
+        else:
+            print 'Error: not a module'
+    except ImportError:
+        print 'Error: No such module could be imported'
 
 def main(argv):
     for arg in clint.args.all:
-        for pkg in walkpkgs(arg):
-            print pkg
+        #for pkg in walkpkgs(arg):
+        #    print pkg
+        o=doc(arg)
+        print o.ismodule
+        m=o.members
+        for e in m:
+            print e
+        pass
 
 if __name__ == '__main__':
     import sys
