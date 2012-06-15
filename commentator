@@ -20,6 +20,7 @@ def walkpkgs(p=None):
     for pkg in walk_packages([p], prefix):
         yield pkg
 
+
 def doc(name):
     obj = __import__(name)
     return obj.__name__
