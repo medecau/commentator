@@ -41,8 +41,9 @@ class Commentator(object):
     
     @property
     def modules(self):
-        for member in pkgutil.iter_modules([os.path.dirname(self.file)]):
-            yield comment(self.name+'.'+member[1])
+        if self.ispackage:
+            for member in pkgutil.iter_modules([os.path.dirname(self.file)]):
+                yield comment(self.name+'.'+member[1])
     
     @property
     def classes(self):
@@ -113,12 +114,13 @@ class Commentator(object):
     
     @property
     def ispackage(self):
-        appendix = ['', 'c', 'o']
-        file_path = self.obj.__file__
+        if self.ismodule:
+            appendix = ['', 'c', 'o']
+            file_path = self.obj.__file__
 
-        for append in appendix:
-            if file_path.endswith('__init__.py' + append):
-                return True
+            for append in appendix:
+                if file_path.endswith('__init__.py' + append):
+                    return True
         return False
     
     @property    
@@ -154,11 +156,8 @@ def load_module(name):
     return obj
 
 def comment(name):
-    try:
-        obj = load_module(name)
-        if inspect.ismodule(obj):
-            return Commentator(obj)
-        else:
-            print 'Error: not a module'
-    except ImportError:
-        print 'Error: No such module could be imported'
+    obj = load_module(name)
+    if inspect.ismodule(obj):
+        return Commentator(obj)
+    else:
+        print 'Error: not a module'

@@ -1,3 +1,11 @@
+'''
+test()
+blablabla
+'''
+
+def _hidden_func(yo):
+    pass
+
 def test(var, var2, var3, **kwargs):
     '''Test function.'''
     return True

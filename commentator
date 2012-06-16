@@ -1,18 +1,47 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys
+import os
 import clint
 import commentator
 
+def markdown(c):
+    md=''
+    if c.ismodule:
+        md+='# %s\n' % c.name
+        if c.doc: md+='%s\n' % c.doc
+        for function in c.functions:
+            md += markdown(function)
+        for classie in c.classes:
+            md += markdown(classie)
+    if c.isfunction and not c.name.startswith('_'):
+        md+='### %s\n' % c
+        if c.doc: md+='%s\n' % c.doc
+    if c.isclass:
+        md+='## %s\n' % c
+        if c.doc: md+='%s\n' % c.doc
+        for method in c.methods:
+            md += markdown(method)
+    if c.ismethod and not c.name.startswith('_'):
+        md+='### %s\n' % c
+        if c.doc: md+='%s\n' % c.doc
+    
+    return md
+
+def doc(thing):
+    try:
+        c=commentator.comment(thing)
+        return markdown(c)
+    except ImportError:
+        pass
+    
+
 def main(argv):
+    sys.path.append(os.getcwd())
     for arg in clint.args.all:
-        d = commentator.comment(arg)
-        print d.file
-        for m in d.members:
-            if m.isroutine:
-                print m
-            if m.isclass:
-                print m
+        doc_str=doc(arg)
+        if doc_str:
+            print doc_str
 
 if __name__ == '__main__':
     main(sys.argv)

@@ -1,6 +1,6 @@
 def foo(bar=None):
     '''
-    foo()
+    The foo function
     '''
     return bar
 
@@ -11,7 +11,7 @@ class Classics(object):
         pass
 
 
-#bar()
+# get in here
 def bar(drink):
     #bar
     #function
