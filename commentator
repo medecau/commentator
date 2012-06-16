@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from inspect import *
+import sys
+import os
 import inspect
+import pkgutil
 import clint
 
 class Commentator(object):
@@ -9,22 +11,65 @@ class Commentator(object):
         self.obj = obj
     
     def __repr__(self):
-        return self.obj.__name__
+        return self.name
     
     @property
     def name(self):
-        return self.obj.__name__
+        try:
+            return self.obj.__name__
+        except AttributeError:
+            return str(type(self.obj))
     
     @property
     def doc(self):
-        return inspect.getdoc(self.obj)
+        return inspect.getdoc(self.obj) or inspect.getcomments(self.obj)
+    
+    @property
+    def file(self):
+        return self.obj.__file__
     
     @property
     def members(self):
         for member in inspect.getmembers(self.obj):
-            c = Commentator(member[1])
-            if c.ismodule or c.isclass or c.ismethod or c.isfunction:
-                yield c
+            d = Commentator(member[1])
+            if d.isfunction or d.ismethod or d.isclass or d.ismodule:
+                yield d
+        
+        for mod in self.modules:
+            yield mod
+    
+    @property
+    def modules(self):
+        for member in pkgutil.iter_modules([os.path.dirname(self.file)]):
+            yield doc(self.name+'.'+member[1])
+    
+    @property
+    def classes(self):
+        for member in self.members:
+            if member.isclass:
+                yield member
+    
+    @property
+    def methods():
+        for member in self.members:
+            if member.ismethod:
+                yield member
+    
+    @property
+    def functions():
+        for member in self.members:
+            if member.isfunction:
+                yield member
+    
+    @property
+    def ispackage(self):
+        appendix = ['', 'c', 'o']
+        file_path = self.obj.__file__
+
+        for append in appendix:
+            if file_path.endswith('__init__.py' + append):
+                return True
+        return False
     
     @property    
     def ismodule(self):
@@ -41,11 +86,19 @@ class Commentator(object):
     @property
     def isfunction(self):
         return inspect.isfunction(self.obj)
+    
 
-def doc(name):
+def load_module(name):
+    obj = __import__(name)
+    mod_path=name.split('.')
+    for sub in mod_path[1:]:
+        obj = obj.__dict__.get(sub)
+    return obj
+
+def comment(name):
     try:
-        obj = __import__(name)
-        if ismodule(obj):
+        obj = load_module(name)
+        if inspect.ismodule(obj):
             return Commentator(obj)
         else:
             print 'Error: not a module'
@@ -54,15 +107,12 @@ def doc(name):
 
 def main(argv):
     for arg in clint.args.all:
-        #for pkg in walkpkgs(arg):
-        #    print pkg
-        o=doc(arg)
-        print o.ismodule
-        m=o.members
-        for e in m:
-            print e
-        pass
+        d = comment(arg)
+        print d.file
+        for m in d.classes:
+            print m
+
+        
 
 if __name__ == '__main__':
-    import sys
     main(sys.argv)
