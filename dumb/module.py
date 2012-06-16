@@ -1,5 +1,6 @@
 class DumbClass(object):
-    pass
+    def _init__(self, name):
+        self.name = name
 
 
 def dumb_function():

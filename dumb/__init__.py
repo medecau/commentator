@@ -5,6 +5,8 @@ def foo(bar=None):
     return bar
 
 class Classics(object):
+    def __init__(self, name=None):
+        self.name=name
     def play(self):
         pass
 

@@ -10,7 +10,9 @@ def main(argv):
         print d.file
         for m in d.members:
             if m.isroutine:
-                print '%s - %s' % (m.name, m.argspec)
+                print m
+            if m.isclass:
+                print m
 
 if __name__ == '__main__':
     main(sys.argv)
