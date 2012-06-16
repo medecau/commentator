@@ -1,8 +1,8 @@
-def foo():
+def foo(bar=None):
     '''
     foo()
     '''
-    pass
+    return bar
 
 class Classics(object):
     def play(self):
@@ -10,7 +10,7 @@ class Classics(object):
 
 
 #bar()
-def bar():
+def bar(drink):
     #bar
     #function
-    pass
+    return drink

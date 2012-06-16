@@ -8,5 +8,6 @@ setup(name='commentator',
       author='Pedro Rodrigues',
       author_email='medecau@gmail.com',
       url='https://github.com/medecau/commentator',
+      py_modules=['comentator.py']
       scripts=['commentator'],
      )
